@@ -171,7 +171,20 @@ class CGAN():
 
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
-                self.sample_images(epoch)
+                self.single_sample_images(epoch)
+
+    def single_sample_images(self, epoch):
+        noise = np.random.normal(0, 1, (1, self.latent_dim))
+        gen_imgs = self.generator.predict(noise)
+
+        # Rescale images 0 - 1
+        gen_imgs = 0.5 * gen_imgs + 0.5
+
+        fig, axs = plt.subplots()
+        axs.imshow(np.clip(gen_imgs[0, :,:,:],0,1.))
+        axs.axis('off')
+        fig.savefig("Keras-GAN/cgan/cifar10/single_cifar10_imagesM/%d.png" % epoch)
+        plt.close()
 
     def sample_images(self, epoch):
         r, c = 2, 5
@@ -188,7 +201,6 @@ class CGAN():
         for i in range(r):
             for j in range(c):
                 axs[i,j].imshow(np.clip(gen_imgs[cnt,:,:,:],0,1.)) 
-                axs[i,j].set_title("Digit: %d" % sampled_labels[cnt])
                 axs[i,j].axis('off')
                 cnt += 1
         fig.savefig("Keras-GAN/cgan/cifar10_images_modified/%d.png" % epoch)
