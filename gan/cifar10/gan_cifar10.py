@@ -144,7 +144,20 @@ class GAN():
 
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
-                self.sample_images(epoch)
+                self.single_sample_images(epoch)
+
+    def single_sample_images(self, epoch):
+        noise = np.random.normal(0, 1, (1, self.latent_dim))
+        gen_imgs = self.generator.predict(noise)
+
+        # Rescale images 0 - 1
+        gen_imgs = 0.5 * gen_imgs + 0.5
+
+        fig, axs = plt.subplots()
+        axs.imshow(gen_imgs[0, :,:])
+        axs.axis('off')
+        fig.savefig("Keras-GAN/gan/cifar10/single_cifar10_images/%d.png" % epoch)
+        plt.close()
 
     def sample_images(self, epoch):
         r, c = 5, 5
