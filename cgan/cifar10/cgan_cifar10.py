@@ -168,7 +168,9 @@ class CGAN():
 
     def single_sample_images(self, epoch):
         noise = np.random.normal(0, 1, (1, self.latent_dim))
-        gen_imgs = self.generator.predict(noise)
+        sampled_labels = np.arange(0, 10).reshape(-1, 1)
+
+        gen_imgs = self.generator.predict([noise, sampled_labels])
 
         # Rescale images 0 - 1
         gen_imgs = 0.5 * gen_imgs + 0.5
@@ -181,7 +183,7 @@ class CGAN():
 
     def sample_images(self, epoch):
         r, c = 2, 5
-        noise = np.random.normal(0, 1, (r * c, 100))
+        noise = np.random.normal(0, 1, (r * c, self.latent_dim))
         sampled_labels = np.arange(0, 10).reshape(-1, 1)
 
         gen_imgs = self.generator.predict([noise, sampled_labels])
@@ -202,4 +204,4 @@ class CGAN():
 
 if __name__ == '__main__':
     cgan = CGAN()
-    cgan.train(epochs=50000, batch_size=32, sample_interval=100)
+    cgan.train(epochs=30000, batch_size=32, sample_interval=100)
