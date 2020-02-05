@@ -60,9 +60,13 @@ class CGAN():
         model.add(Activation('tanh'))
         model.add(Reshape((8,8,16)))
         model.add(Conv2D(16, (3, 3), activation='tanh', strides=1, padding='same'))
+        #model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2DTranspose(128, (3, 3), activation='tanh', strides=2, padding='same'))
+        #model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2DTranspose(64, (3, 3), activation='tanh', strides=2, padding='same'))
+        #model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2DTranspose(self.channels,(3, 3), activation='tanh', strides=1, padding='same'))
+        #model.add(BatchNormalization(momentum=0.8))
 
         model.summary()
 
@@ -125,9 +129,6 @@ class CGAN():
         # Configure input
         X_train = (X_train.astype(np.float32) - 127.5) / 127.5
         X_train = np.expand_dims(X_train, axis=3)
-       
-        # Rescale -1 to 1
-        # X_train = X_train / 127.5 - 1.
         y_train = y_train.reshape(-1, 1)
 
         # Adversarial ground truths
@@ -186,12 +187,11 @@ class CGAN():
         cnt = 0
         for i in range(r):
             for j in range(c):
-                # axs[i,j].imshow(gen_imgs[cnt,:,:])
                 axs[i,j].imshow(np.clip(gen_imgs[cnt,:,:,:],0,1.)) 
                 axs[i,j].set_title("Digit: %d" % sampled_labels[cnt])
                 axs[i,j].axis('off')
                 cnt += 1
-        fig.savefig("Keras-GAN/cgan/cifar10/cifar10_images_modified/%d.png" % epoch)
+        fig.savefig("Keras-GAN/cgan/cifar10_images_modified/%d.png" % epoch)
         plt.close()
 
 if __name__ == '__main__':
