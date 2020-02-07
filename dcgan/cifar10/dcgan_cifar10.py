@@ -1,10 +1,10 @@
 from __future__ import print_function, division
-
-from keras.datasets import mnist
+from keras.initializers import RandomNormal
+from keras.datasets import cifar10
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
 from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.convolutional import UpSampling2D, Conv2D
+from keras.layers.convolutional import UpSampling2D, Conv2D, Conv2DTranspose
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
 
@@ -17,9 +17,9 @@ import numpy as np
 class DCGAN():
     def __init__(self):
         # Input shape
-        self.img_rows = 28
-        self.img_cols = 28
-        self.channels = 1
+        self.img_rows = 32
+        self.img_cols = 32
+        self.channels = 3
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = 100
 
@@ -53,16 +53,19 @@ class DCGAN():
 
         model = Sequential()
 
-        model.add(Dense(128 * 7 * 7, activation="relu", input_dim=self.latent_dim))
-        model.add(Reshape((7, 7, 128)))
+        model.add(Dense(128 * 8 * 8, activation="relu", input_dim=self.latent_dim))
+        model.add(Reshape((8, 8, 128)))
         model.add(UpSampling2D())
+
         model.add(Conv2D(128, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
         model.add(Activation("relu"))
         model.add(UpSampling2D())
+
         model.add(Conv2D(64, kernel_size=3, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
         model.add(Activation("relu"))
+
         model.add(Conv2D(self.channels, kernel_size=3, padding="same"))
         model.add(Activation("tanh"))
 
@@ -80,19 +83,23 @@ class DCGAN():
         model.add(Conv2D(32, kernel_size=3, strides=2, input_shape=self.img_shape, padding="same"))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
+
         model.add(Conv2D(64, kernel_size=3, strides=2, padding="same"))
         model.add(ZeroPadding2D(padding=((0,1),(0,1))))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
+
         model.add(Conv2D(128, kernel_size=3, strides=2, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
+
         model.add(Conv2D(256, kernel_size=3, strides=1, padding="same"))
         model.add(BatchNormalization(momentum=0.8))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dropout(0.25))
+
         model.add(Flatten())
         model.add(Dense(1, activation='sigmoid'))
 
@@ -106,11 +113,16 @@ class DCGAN():
     def train(self, epochs, batch_size=128, save_interval=50):
 
         # Load the dataset
-        (X_train, _), (_, _) = mnist.load_data()
+        (X_train, y_train), (_, _) = cifar10.load_data()
 
-        # Rescale -1 to 1
+        # Extract dogs and cats
+        X_cats = X_train[(y_train == 3).flatten()]
+        X_dogs = X_train[(y_train == 5).flatten()]
+        X_train = np.vstack((X_cats, X_dogs))
+
+        # Configure input rescale fomr [0,255] to [-1, 1]
         X_train = X_train / 127.5 - 1.
-        X_train = np.expand_dims(X_train, axis=3)
+        y_train = y_train.reshape(-1, 1)
 
         # Adversarial ground truths
         valid = np.ones((batch_size, 1))
@@ -157,9 +169,9 @@ class DCGAN():
         gen_imgs = 0.5 * gen_imgs + 0.5
 
         fig, axs = plt.subplots()
-        axs.imshow(gen_imgs[0, :,:,0], cmap='gray')
+        axs.imshow(gen_imgs[0, :,:])
         axs.axis('off')
-        fig.savefig("Keras-GAN/cgan/mnist/single_mnist_images/%d.png" % epoch)
+        fig.savefig("Keras-GAN/dcgan/cifar10/single_cifar10_images/%d.png" % epoch)
         plt.close()
 
     def save_imgs(self, epoch):
@@ -174,13 +186,12 @@ class DCGAN():
         cnt = 0
         for i in range(r):
             for j in range(c):
-                axs[i,j].imshow(gen_imgs[cnt, :,:,0], cmap='gray')
+                axs[i,j].imshow(gen_imgs[cnt, :,:,:])
                 axs[i,j].axis('off')
                 cnt += 1
-        fig.savefig("Keras-GAN/dcgan/mnist/mnist_images/%d.png" % epoch)
+        fig.savefig("Keras-GAN/dcgan/cifar10/cifar10_images/%d.png" % epoch)
         plt.close()
-
 
 if __name__ == '__main__':
     dcgan = DCGAN()
-    dcgan.train(epochs=10000, batch_size=32, save_interval=10)
+    dcgan.train(epochs=5000, batch_size=64, save_interval=10)
