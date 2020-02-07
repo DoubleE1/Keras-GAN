@@ -102,7 +102,7 @@ class GAN():
         X_dogs = X_train[(y_train == 5).flatten()]
         X_train = np.vstack((X_cats, X_dogs))
 
-        # Rescale -1 to 1
+        # Rescale from [0,255] to [-1,1]
         X_train = X_train / 127.5 - 1.
         y_train = y_train.reshape(-1, 1)
 
@@ -144,7 +144,7 @@ class GAN():
 
             # If at save interval => save generated image samples
             if epoch % sample_interval == 0:
-                self.single_sample_images(epoch)
+                self.sample_images(epoch)
 
     def single_sample_images(self, epoch):
         noise = np.random.normal(0, 1, (1, self.latent_dim))
