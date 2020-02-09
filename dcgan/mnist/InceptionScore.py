@@ -47,7 +47,7 @@ def calculate_inception_score(images, n_split=10, eps=1E-16):
       print(i, ix_end, ix_start, n_part)
       subset = subset.astype('float32')
       # scale images to the required size
-      subset = scale_images(subset, (299,299,3))
+      subset = scale_images(subset, (299,299,1))
       # pre-process images, scale to [-1,1]
       subset = preprocess_input(subset)
       # predict p(y|x)
@@ -69,7 +69,7 @@ def calculate_inception_score(images, n_split=10, eps=1E-16):
     is_avg, is_std = mean(scores), std(scores)
     return is_avg, is_std
 
-image_path = "drive/My Drive/Keras-GAN/dcgan/mnist/single_mnist_images"
+image_path = "Keras-GAN/dcgan/mnist/single_mnist_images"
 
 if path.exists(image_path):
   images = []
@@ -82,11 +82,10 @@ if path.exists(image_path):
     image_path = image_path + '/'
     print(image_path)
 
-  for i in range(50000):
+  for i in range(5000):
     if path.exists(image_path + str(f"{i}.png")):
       new_image_path = image_path + str(f"{i}.png")
       print("Loaded image: ", str(f"{i}.png"))
-      # img = np.asarray(Image.open(new_image_path))
       img = Image.open(new_image_path)
       img = crop_center(img)
 

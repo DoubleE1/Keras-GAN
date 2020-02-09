@@ -60,13 +60,13 @@ class CGAN():
         model.add(Activation('tanh'))
         model.add(Reshape((8,8,16)))
         model.add(Conv2D(16, (3, 3), activation='tanh', strides=1, padding='same'))
-        #model.add(BatchNormalization(momentum=0.8))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2DTranspose(128, (3, 3), activation='tanh', strides=2, padding='same'))
-        #model.add(BatchNormalization(momentum=0.8))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2DTranspose(64, (3, 3), activation='tanh', strides=2, padding='same'))
-        #model.add(BatchNormalization(momentum=0.8))
+        model.add(BatchNormalization(momentum=0.8))
         model.add(Conv2DTranspose(self.channels,(3, 3), activation='tanh', strides=1, padding='same'))
-        #model.add(BatchNormalization(momentum=0.8))
+        model.add(BatchNormalization(momentum=0.8))
 
         model.summary()
 
