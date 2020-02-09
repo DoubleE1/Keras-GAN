@@ -69,7 +69,7 @@ def calculate_inception_score(images, n_split=10, eps=1E-16):
     is_avg, is_std = mean(scores), std(scores)
     return is_avg, is_std
 
-image_path = "drive/My Drive/Keras-GAN/dcgan/cifar10/single_cifar10_images"
+image_path = "Keras-GAN/dcgan/cifar10/single_cifar10_images"
 
 if path.exists(image_path):
   images = []
@@ -86,7 +86,6 @@ if path.exists(image_path):
     if path.exists(image_path + str(f"{i}.png")):
       new_image_path = image_path + str(f"{i}.png")
       print("Loaded image: ", str(f"{i}.png"))
-      # img = np.asarray(Image.open(new_image_path))
       img = Image.open(new_image_path)
       img = crop_center(img)
 

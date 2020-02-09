@@ -38,7 +38,7 @@ def calculate_inception_score(images, n_split=10, eps=1E-16):
       print(i, ix_end, ix_start, n_part)
       subset = subset.astype('float32')
       # scale images to the required size
-      subset = scale_images(subset, (299,299,3))
+      subset = scale_images(subset, (299,299,1))
       # pre-process images, scale to [-1,1]
       subset = preprocess_input(subset)
       # predict p(y|x)
